@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Bell, User, LogOut } from "lucide-react";
+import { Search, Bell, User, LogOut, Coffee } from "lucide-react"; // <-- dodao Coffee icon
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"; // <-- Tooltip
 import { supabase } from "@/integrations/supabase/client";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 
@@ -31,9 +32,11 @@ export const Navigation = () => {
       setUser(session?.user ?? null);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
 
     return () => subscription.unsubscribe();
   }, []);
@@ -54,7 +57,9 @@ export const Navigation = () => {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-netflix-darker shadow-lg" : "bg-gradient-to-b from-black/80 to-transparent"
+        isScrolled
+          ? "bg-netflix-darker shadow-lg"
+          : "bg-gradient-to-b from-black/80 to-transparent"
       }`}
     >
       <div className="container mx-auto px-4 py-4">
@@ -65,21 +70,50 @@ export const Navigation = () => {
                 BALKANFLIX
               </h1>
             </Link>
-            
+
             <div className="hidden md:flex space-x-6">
-              <Link to="/" className="text-sm font-medium hover:text-muted-foreground transition-colors">
+              <Link
+                to="/"
+                className="text-sm font-medium hover:text-muted-foreground transition-colors"
+              >
                 Početna
               </Link>
-              <Link to="/movies" className="text-sm font-medium hover:text-muted-foreground transition-colors">
+              <Link
+                to="/movies"
+                className="text-sm font-medium hover:text-muted-foreground transition-colors"
+              >
                 Filmovi
               </Link>
-              <Link to="/tv" className="text-sm font-medium hover:text-muted-foreground transition-colors">
+              <Link
+                to="/tv"
+                className="text-sm font-medium hover:text-muted-foreground transition-colors"
+              >
                 Serije
               </Link>
             </div>
           </div>
 
           <div className="flex items-center space-x-4">
+
+            {/* BUY ME A COFFEE BUTTON */}
+            <TooltipProvider>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <a
+                    href="https://buymeacoffee.com/balkanflix"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-full hover:bg-secondary transition-colors"
+                  >
+                    <Coffee className="h-5 w-5 text-yellow-400" />
+                  </a>
+                </TooltipTrigger>
+                <TooltipContent className="text-center max-w-xs">
+                  <p>Brate, gledaš bez reklama… ako ti znači — časti kafom ☕</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
             <form onSubmit={handleSearch} className="hidden md:block">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -112,7 +146,11 @@ export const Navigation = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button onClick={() => navigate("/auth")} variant="default" size="sm">
+              <Button
+                onClick={() => navigate("/auth")}
+                variant="default"
+                size="sm"
+              >
                 Prijavi se
               </Button>
             )}
